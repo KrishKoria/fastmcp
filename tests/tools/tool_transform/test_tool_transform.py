@@ -21,6 +21,7 @@ from fastmcp.tools.base import ToolResult
 from fastmcp.tools.function_tool import FunctionTool
 from fastmcp.tools.tool_transform import (
     ArgTransform,
+    ArgTransformConfig,
     TransformedTool,
 )
 
@@ -179,6 +180,17 @@ async def test_omitted_arg_uses_transform_fn_python_default():
     tool = Tool.from_tool(parent, transform_fn=child)
     result = await tool.run(arguments={})
     assert result.structured_content == {"result": "s3cr3t"}
+
+
+async def test_arg_transform_default_applies_when_name_is_none():
+    @Tool.from_function
+    def parent(x: int) -> int:
+        return x
+
+    config = ArgTransformConfig(name=None, default=5)
+    tool = Tool.from_tool(parent, transform_args={"x": config.to_arg_transform()})
+    result = await tool.run(arguments={})
+    assert result.structured_content == {"result": 5}
 
 
 def test_tool_change_arg_name(add_tool):

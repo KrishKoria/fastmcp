@@ -450,7 +450,9 @@ class TransformedTool(Tool):
         for orig_name, transform in self.transform_args.items():
             if transform.hide or transform.default is NotSet:
                 continue
-            name = transform.name if transform.name is not NotSet else orig_name
+            name = transform.name
+            if name is NotSet or name is None:
+                name = orig_name
             schema = properties.get(name, {})
             if name not in arguments and "default" in schema:
                 arguments[name] = deepcopy(schema["default"])
